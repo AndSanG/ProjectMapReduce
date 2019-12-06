@@ -35,13 +35,11 @@ class MRSortCustomer(MRJob):
         # select the data types for columns
         df1 = df1.astype({'Quantity': float, 'Price': float, 'Customer ID': int}, errors='ignore')
 
-        complete_list = []
         for i in range(1, df1.shape[0]):
             line = str(df1.iloc[i][0]) + ',' + str(df1.iloc[i][1]) + ',' + str(df1.iloc[i][2])
-            complete_list.append(line)
+            yield None, ''.join(line)
 
-        for line in complete_list:
-            yield None, (''.join(line))
+
 
 
     def mapper_1(self, _, line):
