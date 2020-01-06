@@ -6,6 +6,7 @@ from string import punctuation, digits
 
 top_n = 50
 
+
 class MRSortCount(MRJob):
 
     def steps(self):
@@ -33,25 +34,13 @@ class MRSortCount(MRJob):
         df1 = df1[['primaryTitle']]
 
         # create a list of words with the filtered movies
-        all_words = []
         number_of_movies = df1.shape[0]
         for i in range(number_of_movies):
             movie_name = (df1.iloc[i][0])
-            words = movie_name.split()
-            # print(i)
+            words = str(movie_name).lower().split()
             for word in words:
-                all_words.append(word.lower())
-
-        # eliminate stopwords from the list of words (English, French, Spanish stopwords as well as special characters)
-        eng = stopwords.words('english')
-        fr = stopwords.words('french')
-        esp = stopwords.words('spanish')
-        stop_list = set(eng + fr + esp + list(punctuation) + list(digits))
-
-        filtered_words = [word for word in all_words if word not in stop_list]
-
-        for word in filtered_words:
-            yield word.lower(), 1
+                if word not in stop_list:
+                    yield word.lower(), 1
 
     def combine_word_counts(self, word, counts):
         yield word, sum(counts)
@@ -64,4 +53,11 @@ class MRSortCount(MRJob):
             yield ('%d' % int(count), key)
 
 if __name__ == '__main__':
+
+    # eliminate stopwords from the list of words (English, French,1.1_top_n_keywords_imdb.py Spanish stopwords as well as special characters)
+    eng = stopwords.words('english')
+    fr = stopwords.words('french')
+    esp = stopwords.words('spanish')
+    stop_list = set(eng + fr + esp + list(punctuation) + list(digits))
+
     MRSortCount.run()
