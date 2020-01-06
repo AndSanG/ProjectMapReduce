@@ -25,7 +25,7 @@ class MRMatrixMultiplication(MRJob):
         if name == arg1:
             for row in range(matrix.shape[0]):
                 for col in range(matrix.shape[1]):
-                    for k in range(p):
+                    for k in range(q):
                         yield (row, col, k), (matrix[row][col])
         else:
             for row in range(matrix.shape[0]):
@@ -59,12 +59,12 @@ if __name__ == '__main__':
     A = loadtxt(sys.argv[1])
     B = loadtxt(sys.argv[2])
     m = A.shape[0]
-    n = A.shape[1]
-    n1 = B.shape[0]
-    p = B.shape[1]
-    C = zeros([m,p])
+    p = A.shape[1]
+    p1 = B.shape[0]
+    q = B.shape[1]
+    C = zeros([m, q])
 
-    if(n==n1):
+    if(p==p1):
         MRMatrixMultiplication.run()
         savetxt('C.txt', C)
     else:
