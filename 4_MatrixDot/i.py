@@ -5,9 +5,9 @@ B = np.loadtxt('B.txt')
 C = A@B
 print(C)
 '''
-A = np.random.rand(1000,50)
+A = np.random.rand(10,5)
 
-B = np.random.rand(50,2000)
+B = np.random.rand(5,20)
 
 np.savetxt('A.txt',A)
 np.savetxt('B.txt',B)
