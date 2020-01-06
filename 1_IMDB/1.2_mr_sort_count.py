@@ -1,12 +1,10 @@
 from mrjob.job import MRJob
 from mrjob.step import MRStep
-import re
 import pandas as pd
 from nltk.corpus import stopwords
 from string import punctuation
 from string import digits
 
-WORD_RE = re.compile(r"[\w']+")
 top_n = 15
 
 class MRSortCountbyGenre(MRJob):
@@ -55,13 +53,9 @@ class MRSortCountbyGenre(MRJob):
                         if word.lower() not in stop_list:
                             pair = [genre.lower(), word.lower()]
                             complete_list.append(pair)
-                            #print(i, ' / ', number_of_movies, pair)
-
         complete_list.sort()
-
         for pair in complete_list:
             yield ('\t'.join(pair)), 1
-
 
     def combiner_1(self, genre_and_title, counts):
         yield genre_and_title, sum(counts)

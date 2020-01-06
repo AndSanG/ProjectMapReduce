@@ -1,13 +1,9 @@
 from mrjob.job import MRJob
 from mrjob.step import MRStep
-import re
-
 import pandas as pd
 from nltk.corpus import stopwords
 from string import punctuation, digits
 
-
-WORD_RE = re.compile(r"[\w']+")
 top_n = 50
 
 class MRSortCount(MRJob):
@@ -23,20 +19,6 @@ class MRSortCount(MRJob):
                 reducer=self.reduce_sort_counts
             )
         ]
-
-    def mapper_extract_words(self, _, line):
-        for word in WORD_RE.findall(line):
-            yield word.lower(), 1
-
-    def combine_word_counts(self, word, counts):
-        yield word, sum(counts)
-
-    def reducer_sum_word_counts(self, key, values):
-        yield None, (sum(values), key)
-
-    def reduce_sort_counts(self, _, word_counts):
-        for count, key in (sorted(word_counts, reverse=True)[:top_n]):
-            yield ('%d' % int(count), key)
 
     def mapper_raw(self, input_path, input_uri):
 
@@ -70,6 +52,16 @@ class MRSortCount(MRJob):
 
         for word in filtered_words:
             yield word.lower(), 1
+
+    def combine_word_counts(self, word, counts):
+        yield word, sum(counts)
+
+    def reducer_sum_word_counts(self, key, values):
+        yield None, (sum(values), key)
+
+    def reduce_sort_counts(self, _, word_counts):
+        for count, key in (sorted(word_counts, reverse=True)[:top_n]):
+            yield ('%d' % int(count), key)
 
 if __name__ == '__main__':
     MRSortCount.run()
