@@ -1,7 +1,6 @@
 from mrjob.job import MRJob, MRStep
-from numpy import loadtxt, zeros, savetxt,array
+from numpy import loadtxt, zeros, savetxt
 import sys
-import time
 
 class MRMatrixMultiplication(MRJob):
 
@@ -60,16 +59,19 @@ if __name__ == '__main__':
     A = loadtxt(sys.argv[1])
     B = loadtxt(sys.argv[2])
     m = A.shape[0]
-    n = A.shape[1]  # B.shape[0]
+    n = A.shape[1]
+    n1 = B.shape[0]
     p = B.shape[1]
-    #check matrix shape before starting
     C = zeros([m,p])
 
-    time_start = time.time()
-    MRMatrixMultiplication.run()
-    C_ = A @ B
-    savetxt('C.txt', C)
-    time_end = time.time()
-    dt = time_end - time_start
-    savetxt('time.txt',array(dt))
+    if(n==n1):
+        MRMatrixMultiplication.run()
+        savetxt('C.txt', C)
+    else:
+        CRED = '\033[91m'
+        CEND = '\033[0m'
+        print(CRED + "Error, Matrix shapes does not conform matrix multiplication requirements" + CEND)
+
+
+
 
