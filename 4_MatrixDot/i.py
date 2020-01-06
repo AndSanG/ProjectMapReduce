@@ -5,14 +5,14 @@ B = np.loadtxt('B.txt')
 C = A@B
 print(C)
 '''
-A = np.random.rand(10,5)
+A = np.random.rand(1000,50)
 
-B = np.random.rand(5,20)
+B = np.random.rand(50,2000)
 
-np.savetxt('Asmall.txt',A)
-np.savetxt('Bsmall.txt',B)
+np.savetxt('A.txt',A)
+np.savetxt('B.txt',B)
 
 C = np.dot(A,B)
-np.savetxt('CsmallTest.txt',C)
+np.savetxt('CTest.txt',C)
 
 

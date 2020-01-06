@@ -1,5 +1,5 @@
 from mrjob.job import MRJob, MRStep
-from numpy import loadtxt, zeros, savetxt
+from numpy import loadtxt, zeros, savetxt,array
 import sys
 import time
 
@@ -62,12 +62,14 @@ if __name__ == '__main__':
     m = A.shape[0]
     n = A.shape[1]  # B.shape[0]
     p = B.shape[1]
+    #check matrix shape before starting
     C = zeros([m,p])
 
     time_start = time.time()
     MRMatrixMultiplication.run()
     C_ = A @ B
-    savetxt('Csmall.txt', C)
+    savetxt('C.txt', C)
     time_end = time.time()
     dt = time_end - time_start
-    
+    savetxt('time.txt',array(dt))
+
