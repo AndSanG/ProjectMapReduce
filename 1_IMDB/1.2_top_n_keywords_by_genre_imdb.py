@@ -33,15 +33,10 @@ class MRSortCountbyGenre(MRJob):
         df1 = df1.loc[df['titleType'].isin(['movie'])]
         df1 = df1[['primaryTitle', 'genres']]
 
-        # eliminate stopwords from the list of words (English, French, Spanish stopwords as well as special characters)
-        eng = stopwords.words('english')
-        fr = stopwords.words('french')
-        esp = stopwords.words('spanish')
-        stop_list = set(eng + fr + esp + list(punctuation) + list(digits))
-
         number_of_movies = df1.shape[0]
-        complete_list = []
 
+        # below code helps yielding ((genre & keyword),1) pair for every word in a primaryTitle of a movie,
+        # and does it for each genre that the movie belongs to
         for i in range(1, number_of_movies):
             line = df1.iloc[i][1]
             multiple_genres = line.split(',')
@@ -52,10 +47,7 @@ class MRSortCountbyGenre(MRJob):
                     for word in words_in_primaryTitle:
                         if word.lower() not in stop_list:
                             pair = [genre.lower(), word.lower()]
-                            complete_list.append(pair)
-        complete_list.sort()
-        for pair in complete_list:
-            yield ('\t'.join(pair)), 1
+                            yield ('\t'.join(pair)), 1
 
     def combiner_1(self, genre_and_title, counts):
         yield genre_and_title, sum(counts)
@@ -69,4 +61,11 @@ class MRSortCountbyGenre(MRJob):
 
 
 if __name__ == '__main__':
+
+    # eliminate stopwords from the list of words (English, French, Spanish stopwords as well as special characters)
+    eng = stopwords.words('english')
+    fr = stopwords.words('french')
+    esp = stopwords.words('spanish')
+    stop_list = set(eng + fr + esp + list(punctuation) + list(digits))
+
     MRSortCountbyGenre.run()
