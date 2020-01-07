@@ -10,21 +10,19 @@ class MRSortCustomer(MRJob):
     def steps(self):
         return [
             MRStep(
-                mapper_raw=self.mapper_preprocessor
+                mapper_raw=self.mapper_raw
             ),
             MRStep(
-                mapper=self.mapper_1,
-                reducer=self.reducer_1
+                mapper=self.mapper,
+                combiner=self.combiner,
+                reducer=self.reducer
             ),
             MRStep(
                 reducer=self.reducer_2
-            ),
-            MRStep(
-                reducer=self.reducer_3
             )
         ]
 
-    def mapper_preprocessor(self, input_path, input_uri):
+    def mapper_raw(self, input_path, input_uri):
 
         # read all data from raw file
         df = pd.read_csv(input_path, encoding='latin-1', sep=",", header=0)
@@ -41,20 +39,20 @@ class MRSortCustomer(MRJob):
             line = str(df1.iloc[i][0]) + ',' + str(df1.iloc[i][1]) + ',' + str(df1.iloc[i][2])
             yield None, ''.join(line)
 
-    def mapper_1(self, _, line):
+    def mapper(self, _, line):
         a = line.split(',')
         qty = float(a[0])
         price = float(a[1])
         customer_id = str(a[2])
         yield customer_id, (qty * price)
 
-    def reducer_1(self, customer_id, value):
+    def combiner(self, customer_id, value):
         yield customer_id, sum(value)
 
-    def reducer_2(self, key, values):
+    def reducer(self, key, values):
         yield None, (sum(values), key)
 
-    def reducer_3(self, _, value_and_customer):
+    def reducer_2(self, _, value_and_customer):
         for value, customer_id in (sorted(value_and_customer, reverse=True)[:top_n]):
             yield ('%.2f' % float(value), '%.0f' % float(customer_id))
 
