@@ -38,14 +38,17 @@ class MRCosine(MRJob):
 
     def cosine_score(self, list1, list2):
 
+        # vocab is a dictionary that will later serve as the union set of words in two separate lists.
         vocab = {}
         i = 0
 
+        # the idea of below for loops is to get to the size of list1.union(list2)
+        # using sets instead of lists would make things easier for us but then all occurrences would equal 1.
+        # and this is not desired because occurrences are valuable inputs to our score.
         for word in list1:
             if word not in vocab:
                 vocab[word] = i
                 i += 1
-
         for word in list2:
             if word not in vocab:
                 vocab[word] = i
@@ -60,11 +63,11 @@ class MRCosine(MRJob):
         for word in list1:
             index = vocab[word]     # get index from dictionary
             a[index] += 1           # increment count for that index
-
         for word in list2:
             index = vocab[word]
             b[index] += 1
 
+        # calculate cosine score based on cosine score equation
         cosine_score = np.dot(a, b) / np.sqrt(np.dot(a, a) * np.dot(b, b))
 
         return cosine_score
