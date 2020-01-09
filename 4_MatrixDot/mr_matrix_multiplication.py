@@ -18,44 +18,56 @@ class MRMatrixMultiplication(MRJob):
         ]
 
     def mapper_raw(self, input_path, input_uri):
+        # name of the input file, either A matrix or B matrix
         name = input_uri.split("/")[-1]
+        # name of the A matrix file
         arg1 = sys.argv[1]
         matrix = loadtxt(input_path)
 
+        # per each A element is created as many key value pairs as the number of cols of B.
         if name == arg1:
             for row in range(matrix.shape[0]):
                 for col in range(matrix.shape[1]):
                     for k in range(q):
                         yield (row, col, k), (matrix[row][col])
+
+        # per each B element is created as many key value pairs as the number of rows of A.
         else:
             for row in range(matrix.shape[0]):
                 for col in range(matrix.shape[1]):
                     for k in range(m):
                         yield (k,row, col), (matrix[row][col])
 
+    # combiner added for improvement in the map reduce
     def combiner_mult(self, key, values):
+        # two values with the same key(one per matrix) are multiplied.
         mult = 1
         for value in values:
             mult*=value
         yield key,mult
 
     def reducer_mult(self, key, values):
+        # two values with the same key(one per matrix) are multiplied.
         mult = 1
         for value in values:
             mult*=value
         yield (key[0],key[2]),mult
 
+    # combiner added for improvement in the map reduce
     def combiner_sum(self, key, values):
+        # all the values belonging to the same row,col were multiplied and in this step sum.
         sum_ = sum(values)
         C[key[0]][key[1]] = sum_
         yield key, sum_
 
     def reducer_sum(self, key, values):
+        # all the values belonging to the same row,col were multiplied and in this step sum.
         sum_ =  sum(values)
         C[key[0]][key[1]] = sum_
         yield key, sum_
 
 if __name__ == '__main__':
+    #load matrixes to check the shapes
     A = loadtxt(sys.argv[1])
     B = loadtxt(sys.argv[2])
     m = A.shape[0]
@@ -64,6 +76,7 @@ if __name__ == '__main__':
     q = B.shape[1]
     C = zeros([m, q])
 
+    #check matrix multiplication shapes
     if(p==p1):
         MRMatrixMultiplication.run()
         savetxt('C.txt', C)
